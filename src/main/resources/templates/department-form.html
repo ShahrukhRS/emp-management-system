@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <style type="text/css">
+        form {
+            margin-top: 10px;
+        }
+        label {
+            font-size: 16px;
+            width: 100px;
+            display: block;
+            text-align: right;
+            margin-right: 10px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 250px;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 4px;
+            font-size: 16px;
+        }
+        .save {
+            font-weight: bold;
+            width: 130px;
+            padding: 5px 10px;
+            margin-top: 30px;
+            background: #cccccc;
+        }
+        table {
+            border-style: none;
+            width: 100%;
+        }
+        tr:nth-child(even) {
+            background: #FFFFFF
+        }
+        tr:nth-child(odd) {
+            background: #FFFFFF
+        }
+        tr {
+            border-style: none;
+            text-align: left;
+        }
+        .error
+        {
+            color:red;
+            position: fixed;
+            text-align: left;
+            margin-left: 30px;
+            font: awesome;
+        }
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+    <div id="header">
+        <h2>Employee Management System</h2>
+    </div>
+</div>
+
+<div id="container">
+    <h3>Add Department</h3>
+    <table>
+        <tbody>
+        <tr>
+            <td><label>Department name:</label></td>
+            <td>
+                <label for="deptName"></label><input type="text" id="deptName" name="deptName">
+            </td>
+
+        </tr>
+        <tr>
+            <td><label></label></td>
+            <td><input type="submit" value="Save" class="save" onclick="saveDepartment()"></td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div style=""></div>
+
+    <p>
+        <a href="/view-employees">Back
+            to List</a>
+    </p>
+
+</div>
+
+<script src=""  th:src="@{js/save.js}" ></script>
+
+</body>
+</html>

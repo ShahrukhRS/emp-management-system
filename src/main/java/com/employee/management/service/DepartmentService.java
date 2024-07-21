@@ -1,6 +1,8 @@
 package com.employee.management.service;
 
+import com.employee.management.exception.definition.DepartmentNotFoundException;
 import com.employee.management.payload.DepartmentDto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.el.stream.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import com.employee.management.entity.Department;
 import com.employee.management.repository.DepartmentRepository;
 
 @Service
+@Slf4j
 public class DepartmentService {
 	
 	@Autowired
@@ -16,10 +19,13 @@ public class DepartmentService {
 	
 	public Department findDepartmentById(int id)
 	{
-		java.util.Optional<Department> departmentOptional=departmentRepository.findById(id);
-		
-		Department department= departmentOptional.get();
-		
+		Department department=null;
+		try {
+			 department = departmentRepository.findById(id).orElseThrow(() -> new DepartmentNotFoundException("Bad Request: Department not found"));
+		}
+		catch (DepartmentNotFoundException e) {
+			log.error(e.getMessage());
+		}
 		return department;
 	}
 

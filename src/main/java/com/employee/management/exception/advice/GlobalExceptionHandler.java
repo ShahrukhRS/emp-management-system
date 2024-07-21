@@ -1,5 +1,6 @@
 package com.employee.management.exception.advice;
 
+import com.employee.management.exception.definition.DepartmentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,6 +23,18 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(employeeManagementException,httpStatus);
 		
 		
+	}
+	@ExceptionHandler({DepartmentNotFoundException.class})
+	public ResponseEntity<EmployeeManagementException> handleDepartmentNotFoundException()
+	{
+		EmployeeManagementException employeeManagementException= new EmployeeManagementException();
+		HttpStatus httpStatus=HttpStatus.BAD_REQUEST;
+
+		employeeManagementException.setCode(String.valueOf(httpStatus.value()));
+		employeeManagementException.setMesssage("Bad Request: Department not found");
+		return new ResponseEntity<>(employeeManagementException,httpStatus);
+
+
 	}
 
 }

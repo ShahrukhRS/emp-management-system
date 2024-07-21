@@ -24,43 +24,77 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
-	
+
 	@Autowired
 	private DepartmentService departmentService;
-	
+
 	public List<EmployeeDto> findAll()
 	{
 		List<Employee> employees= employeeRepository.findAll();
-		
-		return employees.stream().map(emmployee->mapToDto(emmployee)).collect(Collectors.toList());
+		List<EmployeeDto> employeeDtoList = null;
+		if(!employees.isEmpty())
+		{
+			employeeDtoList=employees.stream().map(this::mapToDto).collect(Collectors.toList());
+		}
+
+		return  employeeDtoList;
 	}
-	
-	
+
+
 	public EmployeeDto getEmployeeById(int id)
 	{
-		Employee tempEmployee = employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
-		return mapToDto(tempEmployee);
-	}
-	
-	public  EmployeeDto updateEmployee(EmployeeDto employeeDto, int id) {
-		 	Employee tempEmployee = employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
+		Employee tempEmployee=null;
+		EmployeeDto employeeDto = null;
+		try {
+			tempEmployee = employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
+			employeeDto = mapToDto(tempEmployee);
+		}
+		catch(EmployeeNotFoundException e)
+		{
+			log.error(e.getMessage());
+		}
 
-		 	tempEmployee.setFirstName(employeeDto.getFirstName());
-		 	tempEmployee.setLastName(employeeDto.getLastName());
-		 	tempEmployee.setEmail(employeeDto.getEmail());
-			 Employee employee= employeeRepository.save(tempEmployee);
-			 return mapToDto(employee);
+		return employeeDto;
 	}
-	
+
+	public  EmployeeDto updateEmployee(EmployeeDto employeeDto, int id) {
+		Employee employee;
+		EmployeeDto employeeDtoResponse=null;
+		try {
+			Employee tempEmployee = employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
+			tempEmployee.setFirstName(employeeDto.getFirstName());
+			tempEmployee.setLastName(employeeDto.getLastName());
+			tempEmployee.setEmail(employeeDto.getEmail());
+			employee= employeeRepository.save(tempEmployee);
+			employeeDtoResponse= mapToDto(employee);
+
+		}
+		catch(EmployeeNotFoundException e)
+		{
+			log.error(e.getMessage());
+		}
+
+		return employeeDtoResponse;
+	}
+
 
 
 	public MessageResponse deleteEmployeeById(int id) {
 		MessageResponse messageResponse = new MessageResponse();
-		Optional<Employee> employeeOptional = employeeRepository.findById(id);
-		Employee tempEmployee= employeeOptional.get();
-	 	employeeRepository.delete(tempEmployee);
-		messageResponse.setMessage("Employee deleted successfully.");
-		messageResponse.setCode(HttpStatus.OK.value());
+		try {
+			Employee employee= employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
+			employeeRepository.delete(employee);
+			messageResponse.setMessage("Employee deleted successfully.");
+			messageResponse.setCode(HttpStatus.OK.value());
+
+		}
+		catch(EmployeeNotFoundException e)
+		{
+			log.error(e.getMessage());
+			messageResponse.setMessage("Employee not found.");
+			messageResponse.setCode(HttpStatus.NOT_FOUND.value());
+		}
+
 		return messageResponse;
 	}
 
@@ -74,15 +108,15 @@ public class EmployeeService {
 		employeeDto.setEmail(employee.getEmail());
 		employeeDto.setDeptId(employee.getDepartment().getId());
 		employeeDto.setDeptName(employee.getDepartment().getDeptName());
-		
+
 		return employeeDto;
 	}
 	private DepartmentDto mapDepartmentDto(Employee employee) {
 		DepartmentDto departmentDto= new DepartmentDto();
-		
+
 		departmentDto.setId(employee.getDepartment().getId());
 		departmentDto.setDeptName(employee.getDepartment().getDeptName());
-		
+
 		return departmentDto;
 	}
 
@@ -92,31 +126,30 @@ public class EmployeeService {
 		employee.setId(employeedto.getId());
 		employee.setFirstName(employeedto.getFirstName());
 		employee.setLastName(employeedto.getLastName());
-		employee.setEmail(employeedto.getEmail());		
+		employee.setEmail(employeedto.getEmail());
 		return employee;
 	}
 
 	private Department mapToDepartmentEnity(EmployeeDto employeedto) {
-		
+
 		Department department= new Department();
 		department.setId(employeedto.getDeptId());
 		department.setDeptName(employeedto.getDeptName());
-		
+
 		return department;
-		
+
 	}
 
 
 	public EmployeeDto createEmployee(EmployeeDto employeeDto) {
-	
-        Employee employee = mapToEntity(employeeDto);
-        Department department= departmentService.findDepartmentById(employeeDto.getDeptId());
-        employee.setDepartment(department);
-        Employee newEmployee = employeeRepository.save(employee);
-        return mapToDto(newEmployee);
-		
+
+		Employee employee = mapToEntity(employeeDto);
+		Department department= departmentService.findDepartmentById(employeeDto.getDeptId());
+		employee.setDepartment(department);
+		Employee newEmployee = employeeRepository.save(employee);
+		return mapToDto(newEmployee);
+
 	}
 
 
-	
 }

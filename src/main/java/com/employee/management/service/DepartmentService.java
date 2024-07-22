@@ -24,7 +24,7 @@ public class DepartmentService {
 			 department = departmentRepository.findById(id).orElseThrow(() -> new DepartmentNotFoundException("Bad Request: Department not found"));
 		}
 		catch (DepartmentNotFoundException e) {
-			log.error(e.getMessage());
+			log.error("Department not found");
 		}
 		return department;
 	}
@@ -32,6 +32,7 @@ public class DepartmentService {
     public DepartmentDto createDepartment(DepartmentDto departmentDto) {
 		Department department=mapToEntity(departmentDto);
 		Department tempDepartment=departmentRepository.save(department);
+		log.info("Department created with id {}: ",tempDepartment.getId());
 		return mapToDTO(tempDepartment);
     }
 

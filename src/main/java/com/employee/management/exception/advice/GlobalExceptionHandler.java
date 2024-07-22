@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
 
 		employeeManagementException.setCode(String.valueOf(httpStatus.value()));
 		employeeManagementException.setMesssage("Bad Request: Department not found");
+
 		return new ResponseEntity<>(employeeManagementException,httpStatus);
 
 

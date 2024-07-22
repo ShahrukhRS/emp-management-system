@@ -1,6 +1,7 @@
 package com.employee.management.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.employee.management.model.MessageResponse;
@@ -35,6 +36,10 @@ public class EmployeeService {
 		{
 			employeeDtoList=employees.stream().map(this::mapToDto).collect(Collectors.toList());
 		}
+		else
+		{
+			log.error("Employee list is empty");
+		}
 		
 		return  employeeDtoList;
 	}
@@ -42,7 +47,7 @@ public class EmployeeService {
 	
 	public EmployeeDto getEmployeeById(int id)
 	{
-		Employee tempEmployee;
+		Employee tempEmployee=null;
 		EmployeeDto employeeDto = null;
 		try {
 			tempEmployee = employeeRepository.findById(id).orElseThrow(()->new EmployeeNotFoundException("Bad Request: Employee not found"));
@@ -50,7 +55,7 @@ public class EmployeeService {
 		}
 		catch(EmployeeNotFoundException e)
 		{
-			log.error(e.getMessage());
+			log.error("Employee not found with the given id {} :",id);
 		}
 
         return employeeDto;
@@ -66,11 +71,12 @@ public class EmployeeService {
 			tempEmployee.setEmail(employeeDto.getEmail());
 			employee= employeeRepository.save(tempEmployee);
 			employeeDtoResponse= mapToDto(employee);
+			log.info("Employee updated successfully with id {} :",id);
 
 		}
 		catch(EmployeeNotFoundException e)
 		{
-			log.error(e.getMessage());
+			log.error("Employee not found with the given id {} :",id);
 		}
 
 		return employeeDtoResponse;
@@ -85,11 +91,12 @@ public class EmployeeService {
 			employeeRepository.delete(employee);
 			messageResponse.setMessage("Employee deleted successfully.");
 			messageResponse.setCode(HttpStatus.OK.value());
+			log.info("Employee deleted successfully with id {} :",id);
 
 		}
 		catch(EmployeeNotFoundException e)
 		{
-			log.error(e.getMessage());
+			log.error("employee not found with the given id {} :",id);
 			messageResponse.setMessage("Employee not found.");
 			messageResponse.setCode(HttpStatus.NOT_FOUND.value());
 		}
@@ -111,7 +118,6 @@ public class EmployeeService {
 		return employeeDto;
 	}
 
-
 	private Employee mapToEntity(EmployeeDto employeedto)
 	{
 		Employee employee= new Employee();
@@ -124,13 +130,15 @@ public class EmployeeService {
 
 
 
-
 	public EmployeeDto createEmployee(EmployeeDto employeeDto) {
 	
         Employee employee = mapToEntity(employeeDto);
         Department department= departmentService.findDepartmentById(employeeDto.getDeptId());
         employee.setDepartment(department);
         Employee newEmployee = employeeRepository.save(employee);
+
+		log.info("Employee created successfully with id {} :",newEmployee.getId());
+
         return mapToDto(newEmployee);
 		
 	}
